@@ -211,6 +211,7 @@ fn run(options: Options) -> Result<ExitCode, String> {
     let order = match config.scan_order {
         ScanOrder::Linear => "linear",
         ScanOrder::Spiral => "spiral",
+        ScanOrder::ReverseSpiral => "reverse-spiral",
     };
     let loaded = format!(
         "Loaded {} with {} filter(s), {} block constraint(s), and {} direction(s).",

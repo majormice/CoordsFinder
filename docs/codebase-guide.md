@@ -11,7 +11,7 @@ CoordsFinder does five main things:
    from a config file.
 2. It prepares one filter for each direction. Rows for different faces of the
    same block are combined here.
-3. It divides the search area into tiles in linear or spiral order.
+3. It divides the search area into tiles in linear, spiral, or reverse-spiral order.
 4. The CPU or GPU scans every coordinate in those tiles and checks the prepared
    block filters.
 5. It prints coordinates whose block error count is within `errorTolerance`.
@@ -26,7 +26,7 @@ config parsing and validation
 filter preparation for each direction
     |
     v
-linear or spiral tile plan
+linear, spiral, or reverse-spiral tile plan
     |
     +------------------+
     |                  |
@@ -47,7 +47,7 @@ CPU scanner        GPU scanner
 | `src/types.rs` | Types shared by the parser, filter code, and scanners |
 | `src/filter.rs` | Direction rotation, 16-way masks, row combining, and forced errors |
 | `src/texture.rs` | Minecraft and Sodium texture random functions |
-| `src/scan.rs` | Linear and spiral tile planning |
+| `src/scan.rs` | Linear, spiral, and reverse-spiral tile planning |
 | `src/cpu.rs` | Multithreaded CPU scanner |
 | `src/gpu.rs` | wgpu setup, GPU dispatch, and result downloads |
 | `src/search.wgsl` | GPU search code |
@@ -289,6 +289,7 @@ The scan order can be:
 
 - `linear`, starting from the minimum X/Z corner; or
 - `spiral`, starting near the middle of the search range.
+- `reverse-spiral`, following the same path from the outside inward.
 
 `ScanPlan` does not store every tile. `work_item(n)` calculates a tile when a
 scanner asks for it. This keeps plan memory usage small even for very large

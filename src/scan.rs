@@ -143,6 +143,10 @@ impl<'a> ScanPlan<'a> {
         let (tile_index_x, tile_index_z) = match self.scan_order {
             ScanOrder::Linear => (tile_num / self.z_tiles, tile_num % self.z_tiles),
             ScanOrder::Spiral => self.spiral_tile(tile_num),
+            ScanOrder::ReverseSpiral => {
+                let tile_count = self.x_tiles * self.z_tiles;
+                self.spiral_tile(tile_count - 1 - tile_num)
+            }
         };
 
         let x_start = i64::from(self.x_start) + (tile_index_x * self.tile_x) as i64;
@@ -362,7 +366,7 @@ mod tests {
     }
 
     #[test]
-    fn indexed_spiral_matches_reference_for_rectangles() {
+    fn indexed_spiral_orders_match_reference_for_rectangles() {
         fn reference(x_tiles: i64, z_tiles: i64) -> Vec<(i32, i32)> {
             let center_x = (x_tiles - 1) / 2;
             let center_z = (z_tiles - 1) / 2;
@@ -418,7 +422,20 @@ mod tests {
                     .iter()
                     .map(|item| (item.start.x, item.start.z))
                     .collect();
-                assert_eq!(actual, reference(x_tiles.into(), z_tiles.into()));
+                let expected = reference(x_tiles.into(), z_tiles.into());
+                assert_eq!(actual, expected);
+
+                config.scan_order = ScanOrder::ReverseSpiral;
+                let reverse_plan = make_plan(&config, TileSize { x: 1, z: 1 }).unwrap();
+                let reverse_actual: Vec<_> = reverse_plan
+                    .iter()
+                    .map(|item| (item.start.x, item.start.z))
+                    .collect();
+                assert_eq!(
+                    reverse_actual,
+                    expected.into_iter().rev().collect::<Vec<_>>()
+                );
+                config.scan_order = ScanOrder::Spiral;
             }
         }
     }

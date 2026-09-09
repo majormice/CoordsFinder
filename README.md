@@ -79,7 +79,7 @@ An example search config is included in [`example.conf`](./example.conf). It is 
 # Comments start with a hash. (#)
 
 algorithm = Vanilla-3             # Vanilla-1, Vanilla-2, Vanilla-3, Sodium-1, Sodium-2
-scanOrder = spiral                # linear, spiral
+scanOrder = spiral                # linear, spiral, reverse-spiral
 directions = [0]                  # 0, 90, 180, 270
 
 xRange = (-5000, 5000)
@@ -126,6 +126,7 @@ Scan order determines the order in which tiles are scanned.
 
 - `linear` starts from the minimum X/Z corner and moves to the maximum X/Z corner.
 - `spiral` begins at the center and scans in a clockwise spiral pattern.
+- `reverse-spiral` scans the same spiral path in reverse, from the outside inward.
 
 ### Directions
 

@@ -31,6 +31,7 @@ pub struct TileSize {
 pub enum ScanOrder {
     Linear,
     Spiral,
+    ReverseSpiral,
 }
 
 /// Fully parsed and validated settings for a coordinate search.
@@ -253,6 +254,10 @@ pub fn load(path: impl AsRef<Path>) -> Result<ScanConfig, String> {
                     config.scan_order = ScanOrder::Spiral;
                     Ok(())
                 }
+                "reverse-spiral" => {
+                    config.scan_order = ScanOrder::ReverseSpiral;
+                    Ok(())
+                }
                 _ => Err(format!("invalid scan order '{value}'")),
             },
             "directions" => parse_directions(value).map(|parsed| config.directions = parsed),
@@ -344,6 +349,13 @@ mod tests {
         assert_eq!(config.gpu_tile_size, TileSize { x: 70, z: 90 });
         assert_eq!(config.error_tolerance, 2);
         assert_eq!(config.scan_order, ScanOrder::Spiral);
+    }
+
+    #[test]
+    fn parses_reverse_spiral_scan_order() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let config = load(root.join("tests/reverse_spiral.conf")).unwrap();
+        assert_eq!(config.scan_order, ScanOrder::ReverseSpiral);
     }
 
     #[test]
